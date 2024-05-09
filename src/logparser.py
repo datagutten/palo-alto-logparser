@@ -103,7 +103,7 @@ def read_log(logtype_arg):
             if re.match(r'([\d/]+ [\d:]+)', field):
                 field = parse(field)
                 field = field.replace(tzinfo=log_tz)
-                pass
+                field = field.strftime(os.getenv('DATE_FORMAT', '%Y-%m-%d %H:%M:%S'))
 
             fields_named[name] = field
             pos += 1
