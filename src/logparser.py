@@ -24,6 +24,29 @@ now = datetime.datetime.now(log_tz)
 log_tz = now.tzinfo
 
 
+def get_hosts(query):
+    hosts_temp = []
+    logs = loki_client.query_range(query)
+    for log in logs['data']['result']:
+        if log['stream']['HOST'] not in hosts_temp:
+            hosts_temp.append(log['stream']['HOST'])
+    return hosts_temp
+
+
+@app.route('/hosts', methods=['GET'])
+def find_hosts():
+    query = '{job="syslog"} | logfmt'
+    host_list = []
+    while True:
+        for host in host_list:
+            query += ' != "%s"' % host
+        hosts = get_hosts(query)
+        if not hosts:
+            break
+        host_list += hosts
+    return jsonify(host_list)
+
+
 # @app.route('/', defaults={'logtype_arg': 'TRAFFIC'})
 @app.route('/<string:logtype_arg>', methods=['GET'])  # , defaults={'logtype_arg': 'TRAFFIC'})
 def read_log(logtype_arg):
