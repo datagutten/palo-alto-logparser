@@ -114,4 +114,4 @@ def read_log(logtype_arg):
 
 
 if __name__ == '__main__':
-    app.run(port=5000, host='0.0.0.0')
+    app.run(port=int(os.getenv('LISTEN_PORT', 80)), host='0.0.0.0')
